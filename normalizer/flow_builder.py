@@ -10,6 +10,7 @@ class flow_builder:
         return {
             'dst_ips': set(),
             'ports': set(),
+            'port_list': [],
             'timestamps': [],
             'syn_count': 0,
             'ack_count': 0,
@@ -57,9 +58,11 @@ class flow_builder:
         
         if pkt['protocol'] == 'TCP':
             flow['ports'].add(pkt['dst_port'])
+            flow['port_list'].append(pkt['dst_port'])
             self._count_flags(flow,pkt['flags'])
         elif pkt['protocol'] == 'UDP':
             flow['ports'].add(pkt['dst_port'])
+            flow['port_list'].append(pkt['dst_port'])
         elif pkt['protocol'] == 'ICMP':
             if pkt.get('icmp_type') == 8:
                 flow['icmp_echo'] += 1

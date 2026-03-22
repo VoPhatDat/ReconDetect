@@ -26,7 +26,7 @@ def capture(interface: str | None = None, packet_count: int = 0):
         count  = 0
 
         for ts, buf in reader:
-            pkt = _parse_packet(ts, buf)
+            pkt = parse_packet(ts, buf)
 
             if pkt is None:
                 continue
