@@ -1,4 +1,4 @@
-# ReconDetect — Tài liệu dự án
+# ReconDetect — Tài liệu dự án (đang phát triển)
 ## Hệ thống phát hiện tấn công quét mạng chủ động (Active Network Scanning Detection)
 
 ---
