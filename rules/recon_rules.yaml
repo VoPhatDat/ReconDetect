@@ -1,0 +1,24 @@
+  rules:
+  - id: R008
+    name: ACK Scan
+    confidence: CONFIRMED
+    conditions:
+      ack_count:  { gt: 20 }
+      ack_ratio:  { gt: 10 }
+      syn_count:  { eq: 0 }
+
+  - id: R009
+    name: Fast Scan (Masscan/Zmap)
+    confidence: CONFIRMED
+    conditions:
+      port_count:  { gt: 100 }
+      pkt_per_sec: { gt: 1000 }
+      ack_ratio:   { lt: 0.1 }
+
+  - id: R010
+    name: Suspicious Host Discovery
+    confidence: SUSPECTED
+    conditions:
+      dst_ip_count: { gt: 20 }
+      port_count:   { lt: 5 }
+      duration:     { lt: 10 }
