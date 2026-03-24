@@ -47,16 +47,16 @@ recon_detector/
 │   ├── __init__.py
 │   ├── flow_builder.py      # gom packet theo src_ip
 │   └── extractor.py         # tính feature từ flow
-├── engine/                  # chưa làm
-│   ├── __init__.py
-│   ├── rule_loader.py
+├── engine/                  # đang thực hiện
+│   ├── rule_loader.py       # load rule từ thư mục rule
 │   ├── rule_matcher.py
 │   └── alert.py
 ├── rules/                   # chưa làm
 │   └── recon_rules.yaml
 ├── output/                  # chưa làm
 │   └── reporter.py
-├── tests/
+├── rule/
+│   └── recon_rules.yaml
 ├── pcap/
 └── main.py
 ```
@@ -287,7 +287,7 @@ engine/
 rules:
   - id: R001
     name: SYN Port Scan
-    severity: HIGH
+    confidence: CONFIRMED
     conditions:
       port_count: { gt: 20 }
       ack_ratio:  { lt: 0.3 }
@@ -295,7 +295,7 @@ rules:
 
   - id: R002
     name: Slow and Low Scan
-    severity: MEDIUM
+    confidence: SUSPECTED
     conditions:
       port_count: { gt: 20 }
       ack_ratio:  { lt: 0.3 }
@@ -303,22 +303,10 @@ rules:
 
   - id: R003
     name: NULL Scan
-    severity: HIGH
+    confidence: CONFIRMED
     conditions:
       null_count: { gt: 5 }
-
-  - id: R004
-    name: XMAS Scan
-    severity: HIGH
-    conditions:
-      xmas_count: { gt: 5 }
-
-  - id: R005
-    name: Ping Sweep
-    severity: MEDIUM
-    conditions:
-      icmp_echo:    { gt: 10 }
-      dst_ip_count: { gt: 10 }
+...
 ```
 
 Operators hỗ trợ: `gt`, `lt`, `gte`, `lte`, `eq`
@@ -331,7 +319,7 @@ Operators hỗ trợ: `gt`, `lt`, `gte`, `lte`, `eq`
 {
     'rule_id':   'R001',
     'rule_name': 'SYN Port Scan',
-    'severity':  'HIGH',
+    'severity':  'CONFIRMED',
     'src_ip':    '192.168.177.134',
     'timestamp': '2024-03-19 10:30:45',
     'evidence':  {
@@ -396,7 +384,7 @@ Kết luận: `192.168.177.134` đang thực hiện SYN scan trên 1000 port.
 ✅ collector/live_capture.py
 ✅ normalizer/flow_builder.py
 ✅ normalizer/extractor.py
-⏳ engine/rule_loader.py
+✅ engine/rule_loader.py
 ⏳ engine/rule_matcher.py
 ⏳ engine/alert.py
 ⏳ rules/recon_rules.yaml
@@ -412,5 +400,5 @@ Kết luận: `192.168.177.134` đang thực hiện SYN scan trên 1000 port.
 - OS: Windows (phát triển), Linux (deploy sau)
 - Python: 3.13
 - Thư viện: dpkt, pyyaml
-- Công cụ: TShark (đi kèm Wireshark), VS Code
+- Công cụ: TShark, VS Code
 - GitHub: https://github.com/VoPhatDat/ReconDetect
