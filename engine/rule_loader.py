@@ -1,5 +1,4 @@
-import operator
-
+#engine/rule_loader.py
 import yaml
 from pathlib import Path
 
@@ -22,10 +21,10 @@ def _validate_rule(rule: dict):
     
     #check operator hợp lệ
     for feature, op_val in rule["conditions"].items():
-        operator = list(op_val.keys())[0]
-        if operator not in VALID_OPERATORS:
-            raise ValueError(f"Rule '{rule['id']}': operator '{operator}' không hợp lệ. Phải là {VALID_OPERATORS}")
-        
+        for operator in op_val.keys():
+            if operator not in VALID_OPERATORS:
+                raise ValueError(f"Rule '{rule['id']}': operator '{operator}' không hợp lệ")
+            
 def load_rules(path: str) -> list[dict]:
     with open(path, 'r', encoding="utf-8") as f:
         data = yaml.safe_load(f)

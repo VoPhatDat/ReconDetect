@@ -1,11 +1,59 @@
-  rules:
+rules:
+  - id: R001
+    name: SYN Port Scan
+    confidence: CONFIRMED
+    conditions:
+      port_count: { gt: 20 }
+      ack_ratio:  { lt: 0.3 }
+      duration:   { lt: 5 }
+
+  - id: R002
+    name: Slow and Low Scan
+    confidence: SUSPECTED
+    conditions:
+      port_count: { gt: 20 }
+      ack_ratio:  { lt: 0.3 }
+      duration:   { gt: 30 }
+
+  - id: R003
+    name: NULL Scan
+    confidence: CONFIRMED
+    conditions:
+      null_count: { gt: 5 }
+
+  - id: R004
+    name: XMAS Scan
+    confidence: CONFIRMED
+    conditions:
+      xmas_count: { gt: 5 }
+
+  - id: R005
+    name: FIN Scan
+    confidence: CONFIRMED
+    conditions:
+      fin_count: { gt: 5 }
+      ack_ratio: { lt: 0.3 }
+
+  - id: R006
+    name: Ping Sweep
+    confidence: SUSPECTED
+    conditions:
+      icmp_echo:    { gt: 10 }
+      dst_ip_count: { gt: 10 }
+
+  - id: R007
+    name: UDP Port Scan
+    confidence: SUSPECTED
+    conditions:
+      port_count: { gt: 20 }
+      syn_count:  { eq: 0 }
+
   - id: R008
     name: ACK Scan
     confidence: CONFIRMED
     conditions:
-      ack_count:  { gt: 20 }
-      ack_ratio:  { gt: 10 }
-      syn_count:  { eq: 0 }
+      ack_count: { gt: 20 }
+      syn_count: { eq: 0 }
 
   - id: R009
     name: Fast Scan (Masscan/Zmap)
@@ -16,9 +64,9 @@
       ack_ratio:   { lt: 0.1 }
 
   - id: R010
-    name: Suspicious Host Discovery
-    confidence: SUSPECTED
+    name: Half-Open Scan Burst
+    confidence: CONFIRMED
     conditions:
-      dst_ip_count: { gt: 20 }
-      port_count:   { lt: 5 }
-      duration:     { lt: 10 }
+      syn_count: { gt: 200 }
+      rst_count: { gt: 100 }
+      ack_ratio: { lt: 0.05 }
