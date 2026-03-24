@@ -70,6 +70,7 @@ class flow_builder:
     def get_flows(self):
         return self.flows
 
+#Test thì để trong if main
 def run_test():
     import sys
     sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parent.parent))
@@ -99,5 +100,3 @@ def run_test():
         print(f"  ack_count: {flow['ack_count']}")
         print(f"  duration:  {max(flow['timestamps']) - min(flow['timestamps']):.2f}s")
         print()
-if __name__ == '__main__':
-    run_test()

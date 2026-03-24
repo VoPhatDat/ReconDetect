@@ -1,72 +1,224 @@
 rules:
-  - id: R001
-    name: SYN Port Scan
+
+  # ========================
+  # 🔥 MASSIVE RECON
+  # ========================
+  - id: R200
+    name: Massive Host Discovery
     confidence: CONFIRMED
     conditions:
-      port_count: { gt: 20 }
-      ack_ratio:  { lt: 0.3 }
-      duration:   { lt: 5 }
+      dst_ip_count: { gt: 100 }
 
-  - id: R002
-    name: Slow and Low Scan
+  - id: R201
+    name: Wide Network Scan
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 50 }
+      duration:     { lt: 30 }
+
+  - id: R202
+    name: Slow Wide Scan
     confidence: SUSPECTED
     conditions:
-      port_count: { gt: 20 }
-      ack_ratio:  { lt: 0.3 }
-      duration:   { gt: 30 }
+      dst_ip_count: { gt: 50 }
+      duration:     { gt: 60 }
 
-  - id: R003
-    name: NULL Scan
+
+  # ========================
+  # ⚡ SPEED BASED
+  # ========================
+  - id: R210
+    name: High Speed Scan
     confidence: CONFIRMED
     conditions:
-      null_count: { gt: 5 }
+      pkt_per_sec: { gt: 50 }
 
-  - id: R004
-    name: XMAS Scan
+  - id: R211
+    name: Medium Speed Scan
+    confidence: SUSPECTED
+    conditions:
+      pkt_per_sec: { gt: 20 }
+
+  - id: R212
+    name: Burst Scan
     confidence: CONFIRMED
     conditions:
-      xmas_count: { gt: 5 }
+      pkt_per_sec: { gt: 30 }
+      duration:    { lt: 5 }
 
-  - id: R005
-    name: FIN Scan
+
+  # ========================
+  # 🌐 ICMP SWEEP
+  # ========================
+  - id: R220
+    name: ICMP Sweep Aggressive
     confidence: CONFIRMED
     conditions:
-      fin_count: { gt: 5 }
-      ack_ratio: { lt: 0.3 }
+      icmp_echo:    { gt: 30 }
+      dst_ip_count: { gt: 20 }
 
-  - id: R006
-    name: Ping Sweep
+  - id: R221
+    name: ICMP Sweep General
     confidence: SUSPECTED
     conditions:
       icmp_echo:    { gt: 10 }
       dst_ip_count: { gt: 10 }
 
-  - id: R007
-    name: UDP Port Scan
+  - id: R222
+    name: ICMP Slow Sweep
+    confidence: SUSPECTED
+    conditions:
+      icmp_echo:    { gt: 10 }
+      duration:     { gt: 30 }
+
+
+  # ========================
+  # 🧨 ARP SWEEP
+  # ========================
+  - id: R230
+    name: ARP Massive Sweep
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 100 }
+
+  - id: R231
+    name: ARP High Speed Sweep
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 50 }
+      pkt_per_sec:  { gt: 20 }
+
+  - id: R232
+    name: ARP Slow Sweep
+    confidence: SUSPECTED
+    conditions:
+      dst_ip_count: { gt: 30 }
+      duration:     { gt: 60 }
+
+
+  # ========================
+  # 🔥 PORT SCAN
+  # ========================
+  - id: R240
+    name: Full Port Scan
+    confidence: CONFIRMED
+    conditions:
+      port_count: { gt: 100 }
+
+  - id: R241
+    name: Medium Port Scan
+    confidence: SUSPECTED
+    conditions:
+      port_count: { gt: 30 }
+
+  - id: R242
+    name: Slow Port Scan
     confidence: SUSPECTED
     conditions:
       port_count: { gt: 20 }
-      syn_count:  { eq: 0 }
+      duration:   { gt: 60 }
 
-  - id: R008
-    name: ACK Scan
+
+  # ========================
+  # 🧠 STEALTH (SYN)
+  # ========================
+  - id: R250
+    name: SYN Scan
     confidence: CONFIRMED
     conditions:
-      ack_count: { gt: 20 }
-      syn_count: { eq: 0 }
+      syn_count: { gt: 20 }
+      ack_ratio: { lt: 0.3 }
 
-  - id: R009
-    name: Fast Scan (Masscan/Zmap)
+  - id: R251
+    name: Aggressive SYN Scan
     confidence: CONFIRMED
     conditions:
-      port_count:  { gt: 100 }
-      pkt_per_sec: { gt: 1000 }
-      ack_ratio:   { lt: 0.1 }
+      syn_count:   { gt: 50 }
+      pkt_per_sec: { gt: 10 }
 
-  - id: R010
-    name: Half-Open Scan Burst
+  - id: R252
+    name: Slow SYN Scan
+    confidence: SUSPECTED
+    conditions:
+      syn_count: { gt: 20 }
+      duration:  { gt: 60 }
+
+
+  # ========================
+  # 💀 RST / FAIL PATTERN
+  # ========================
+  - id: R260
+    name: High RST Response
     confidence: CONFIRMED
     conditions:
-      syn_count: { gt: 200 }
-      rst_count: { gt: 100 }
-      ack_ratio: { lt: 0.05 }
+      rst_count: { gt: 20 }
+
+  - id: R261
+    name: RST Ratio High
+    confidence: SUSPECTED
+    conditions:
+      rst_ratio: { gt: 0.5 }
+
+
+  # ========================
+  # 🧪 RARE SCANS
+  # ========================
+  - id: R270
+    name: NULL Scan
+    confidence: CONFIRMED
+    conditions:
+      null_count: { gt: 5 }
+
+  - id: R271
+    name: XMAS Scan
+    confidence: CONFIRMED
+    conditions:
+      xmas_count: { gt: 5 }
+
+  - id: R272
+    name: FIN Scan
+    confidence: CONFIRMED
+    conditions:
+      fin_count: { gt: 5 }
+
+
+  # ========================
+  # 🧬 ENTROPY DETECTION
+  # ========================
+  - id: R280
+    name: High Entropy Scan
+    confidence: CONFIRMED
+    conditions:
+      port_entropy: { gt: 4 }
+
+  - id: R281
+    name: Medium Entropy Scan
+    confidence: SUSPECTED
+    conditions:
+      port_entropy: { gt: 3 }
+
+
+  # ========================
+  # 🔗 COMBO DETECTION
+  # ========================
+  - id: R290
+    name: Recon Chain (Sweep + Scan)
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 20 }
+      port_count:   { gt: 20 }
+
+  - id: R291
+    name: Multi Behavior Scan
+    confidence: CONFIRMED
+    conditions:
+      syn_count:    { gt: 20 }
+      icmp_echo:    { gt: 10 }
+
+  - id: R292
+    name: Multi Target + Multi Port
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 20 }
+      port_count:   { gt: 20 }
+      pkt_per_sec:  { gt: 10 }
