@@ -6,7 +6,7 @@ import sys
 from collector.parser import parse_packet
 sys.stdout.reconfigure(encoding='utf-8')
 
-def _detech_format(path: Path) -> str:
+def _detect_format(path: Path) -> str:
 	with open(path, "rb") as f:
 		magicbyte = f.read(4)
 	if magicbyte == b'\x0a\x0d\x0d\x0a':
@@ -22,7 +22,7 @@ def read(filepath: str):
 	if not path.exists():
 		raise FileNotFoundError(f"Không tìm thấy file: {filepath}")
 
-	formatcheck = _detech_format(path)
+	formatcheck = _detect_format(path)
 
 	with open(path, "rb") as f:
 		reader = dpkt.pcapng.Reader(f) if formatcheck == "pcapng" else dpkt.pcap.Reader(f)

@@ -6,6 +6,28 @@ import dpkt
 def parse_packet(ts: float, buf: bytes) -> dict | None:
     try:
         eth = dpkt.ethernet.Ethernet(buf)
+        
+        #ARP ở layer 2
+        arp = eth.data
+        if isinstance(eth.data, dpkt.arp.ARP):
+            arp = eth.data
+            if arp.op != 1: #không phải ARP request thì cook (opcode = 1)
+                return None
+            sender_ip = socket.inet_ntoa(arp.spa)
+            target_ip = socket.inet_ntoa(arp.tpa)
+            return {
+                "timestamp": ts,
+                "protocol":  "ARP",
+                "src_ip":    sender_ip,      
+                "dst_ip":    target_ip,      
+                "src_port":  None,
+                "dst_port":  None,
+                "flags":     None,
+                "length":    len(buf),
+                "arp_op":    arp.op          
+            }
+            
+        #IPv4  (TCP/UDP/ICMP)
         if not isinstance(eth.data, dpkt.ip.IP):
             return None
         ip = eth.data

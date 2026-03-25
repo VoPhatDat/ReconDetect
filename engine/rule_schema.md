@@ -126,7 +126,7 @@ Các feature này được tính bởi `normalizer/extractor.py` từ flow của
 |---------|------|-------|---------|
 | `ack_ratio` | float | ack_count / syn_count | 0 nếu syn_count = 0 |
 | `rst_ratio` | float | rst_count / syn_count | 0 nếu syn_count = 0 |
-| `pkt_per_sec` | float | syn_count / duration | 0 nếu duration = 0 |
+| `pkt_per_sec` | float | tổng packet / duration | 0 nếu duration = 0 |
 | `avg_interval` | float | duration / số packet | giây/packet |
 
 ### Entropy
