@@ -35,16 +35,18 @@ def run_pcap(pcap_path: str) -> None:
 
     report(all_alerts)
 
-
 def run_live(interface: str | None = None) -> None:
     print(f"[*] Live capture — chạy liên tục (Ctrl+C để dừng)")
-    print(f"[*] Alert sẽ hiển thị mỗi ~{REPORT_INTERVAL} giây khi phát hiện scan\n")
+    print(f"[*] Alert chỉ hiển thị 1 lần cho mỗi loại scan của mỗi IP\n")
 
     rules = load_rules(RULES_PATH)
     print(f"[*] Đã load {len(rules)} rule\n")
 
     builder = flow_builder()
     last_report_time = time.time()
+
+    # Bộ nhớ: lưu những rule nào đã alert rồi
+    seen = {}   # key = src_ip, value = set của rule_id
 
     try:
         for pkt in capture(interface=interface, packet_count=0):
@@ -54,12 +56,24 @@ def run_live(interface: str | None = None) -> None:
                 flows = builder.get_flows()
                 features_list = extract_all(flows)
 
-                all_alerts = []
+                current_alerts = []
                 for features in features_list:
                     alerts = match(features, rules)
-                    all_alerts.extend(alerts)
 
-                report(all_alerts)          # luôn in (có hay không cũng in)
+                    for alert in alerts:
+                        ip = alert.src_ip
+                        rule_id = alert.rule_id
+
+                        # Khởi tạo set nếu IP chưa có
+                        if ip not in seen:
+                            seen[ip] = set()
+
+                        # Chỉ thêm alert nếu rule này của IP này chưa từng alert
+                        if rule_id not in seen[ip]:
+                            seen[ip].add(rule_id)
+                            current_alerts.append(alert)
+
+                report(current_alerts)
 
                 last_report_time = time.time()
 
@@ -68,18 +82,16 @@ def run_live(interface: str | None = None) -> None:
         print("\n[*] Kiểm tra lần cuối...")
         flows = builder.get_flows()
         features_list = extract_all(flows)
-        all_alerts = []
+        final_alerts = []
         for features in features_list:
             alerts = match(features, rules)
-            all_alerts.extend(alerts)
-        report(all_alerts)
+            final_alerts.extend(alerts)
+        report(final_alerts)
         print("\n[*] Live capture đã dừng.")
-
-
 if __name__ == "__main__":
-    MODE = "live"   # đổi thành "pcap" nếu muốn test file
+    MODE = "pcap"   # đổi thành "pcap" nếu muốn test file
 
     if MODE == "pcap":
-        run_pcap("pcap/TCP_Syn.pcapng")
+        run_pcap("pcap/Nmap-and-Wireshark-Lab-main/SX Scan.pcapng")
     else:
         run_live()

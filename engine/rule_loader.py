@@ -35,7 +35,3 @@ def load_rules(path: str) -> list[dict]:
         
     return rules
    
-if __name__ == "__main__":
-    rules = load_rules("../rules/recon_rules.yaml")
-    for rule in rules:
-        print(rule["id"], rule["name"]) 
