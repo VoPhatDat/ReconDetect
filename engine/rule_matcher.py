@@ -1,5 +1,4 @@
 #engine/rule_matcher.py
-from datetime import datetime
 from engine.alert import Alert
 
 #Kiểm tra toán tử và giá trị điều kiện
@@ -30,13 +29,49 @@ def match(features: dict, rules: list[dict]) -> list[Alert]:
     alerts = []
     for rule in rules:
         if _check_rule(features, rule):
+            timestamp = features.get("timestamp", "")
+            if not timestamp:
+                # fallback: nếu không có timestamp trong features thì alert vẫn hoạt động
+                timestamp = ""
+
+            evidence = {f: features.get(f, 0) for f in rule["conditions"]}
+
+            # Context giúp giải thích "bối cảnh scan" ngay trên console/txt.
+            context_fields = [
+                "packet_count",
+                "port_count",
+                "dst_ip_count",
+                "duration",
+                "tcp_port_count",
+                "tcp_port_entropy",
+                "udp_port_count",
+                "udp_packet_count",
+                "udp_port_entropy",
+                "syn_count",
+                "ack_count",
+                "rst_count",
+                "fin_count",
+                "null_count",
+                "xmas_count",
+                "icmp_echo",
+                "arp_request",
+                "ack_ratio",
+                "rst_ratio",
+                "pkt_per_sec",
+                "avg_interval",
+                "port_entropy",
+            ]
+            context = {k: features.get(k, 0) for k in context_fields if k in features}
+
             alert = Alert(
                 rule_id    = rule["id"],
                 rule_name  = rule["name"],
                 confidence = rule["confidence"],
                 src_ip     = features["src_ip"],
-                timestamp  = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                evidence   = {f: features.get(f, 0) for f in rule["conditions"]},
+                timestamp  = timestamp,
+                conditions = rule["conditions"],
+                evidence   = evidence,
+                context    = context,
             )
             alerts.append(alert)
     return alerts

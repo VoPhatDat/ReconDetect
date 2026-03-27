@@ -25,6 +25,7 @@ rules:
     conditions:
       pkt_per_sec:  { gt: 100 }
       dst_ip_count: { gt: 10 }          # phải quét nhiều IP
+      syn_count:    { gt: 80 }          # tránh match nhầm traffic burst không phải scan
 
   - id: R211
     name: High Speed Scan (Nmap -T4/-T5)
@@ -33,14 +34,18 @@ rules:
       pkt_per_sec:  { gt: 50 }
       duration:     { lt: 10 }
       port_count:   { gt: 20 }          # phải quét nhiều port
+      syn_count:    { gt: 60 }
+      ack_ratio:    { lt: 0.6 }
 
   - id: R212
     name: Medium Speed Scan
     confidence: SUSPECTED
     conditions:
       pkt_per_sec:  { gt: 20 }
-      port_count:   { gt: 30 }
-      port_entropy: { gt: 4 }
+      tcp_port_count:   { gt: 30 }
+      tcp_port_entropy: { gt: 4 }
+      syn_count:        { gt: 60 }
+      dst_ip_count:     { gt: 2 }
 
   - id: R213
     name: Burst Scan
@@ -78,34 +83,57 @@ rules:
     name: SYN Scan (Nmap -sS)
     confidence: CONFIRMED
     conditions:
-      syn_count:    { gt: 30 }
+      syn_count:    { gt: 80 }
       ack_ratio:    { lt: 0.3 }
-      port_entropy: { gt: 3 }
+      tcp_port_entropy: { gt: 3 }
+
+  # ========================
+  # UDP scan detection
+  # ========================
+  - id: R260
+    name: UDP Port Scan (Broad)
+    confidence: CONFIRMED
+    conditions:
+      udp_port_count:   { gt: 30 }
+      udp_packet_count: { gt: 60 }
+      udp_port_entropy: { gt: 4 }
+      syn_count:        { lt: 5 }   # tránh nhầm với TCP scan
+
+  - id: R261
+    name: UDP Scan (Moderate)
+    confidence: SUSPECTED
+    conditions:
+      udp_port_count:   { gt: 15 }
+      udp_packet_count: { gt: 30 }
+      dst_ip_count:     { gt: 1 }
+      syn_count:        { lt: 5 }
 
   - id: R270
     name: NULL Scan
     confidence: CONFIRMED
     conditions:
-      null_count: { gt: 5 }
+      null_count: { gt: 10 }
 
   - id: R271
     name: XMAS Scan
     confidence: CONFIRMED
     conditions:
-      xmas_count: { gt: 5 }
+      xmas_count: { gt: 10 }
 
   - id: R272
     name: FIN Scan
     confidence: CONFIRMED
     conditions:
-      fin_count: { gt: 5 }
+      fin_count: { gt: 10 }
+      syn_count: { lt: 5 }
 
   - id: R280
     name: High Entropy Port Scan (tool tự động)
     confidence: CONFIRMED
     conditions:
-      port_entropy: { gt: 6 }
-      port_count:   { gt: 30 }
+      tcp_port_entropy: { gt: 6 }
+      tcp_port_count:   { gt: 30 }
+      syn_count:        { gt: 60 }
 
   # Combo
   - id: R290
