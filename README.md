@@ -26,7 +26,7 @@ Network Traffic
       ↓
   Logger/Reporter    ← Xuất kết quả
 ```
-Sơ đồ kiến trúc
+###Sơ đồ kiến trúc
 <img width="998" height="594" alt="image" src="https://github.com/user-attachments/assets/4272d891-6867-463a-8ab6-79ec5982054e" />
 ---
 ---
