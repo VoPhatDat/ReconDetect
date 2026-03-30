@@ -2,8 +2,9 @@
 from engine.alert import Alert
 
 #Kiểm tra toán tử và giá trị điều kiện
-def _check_conditions(value: float, op_val: dict) -> bool:
-    for operator, threshold in op_val.items():
+def _check_conditions(value: float, op_val: dict) -> bool:  #value là giá thị thực tế, threshold (trong op_val) là giá trị ngưỡng
+    for operator, threshold in op_val.items():              #op_val là danh sách các {operator: threshold} trong rule (xem rule là hiểu lol)
+
         if operator == 'gt' and not (value > threshold):
             return False
         elif operator == 'lt' and not (value < threshold):
@@ -23,7 +24,23 @@ def _check_rule(features:dict, rule:dict) -> bool:
         if not _check_conditions(value, op_val):
             return False
     return True
-        
+
+
+"""
+rules:
+  - id: R200
+    name: Massive Host Discovery
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 100 }
+
+  - id: R201
+    name: Wide Network Scan (Fast)
+    confidence: CONFIRMED
+    conditions:
+      dst_ip_count: { gt: 50 }
+      duration:     { lt: 30 }
+"""        
 #Hàm so khớp các rule với features trả về một list Alert (in ra)
 def match(features: dict, rules: list[dict]) -> list[Alert]:
     alerts = []

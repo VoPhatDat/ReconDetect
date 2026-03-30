@@ -126,7 +126,7 @@ def report(
     """
     if not alerts:
         if not quiet_if_empty:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✓ Không phát hiện scan mới")
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] ✓ No alerts detected.")
         return
 
     global _TABLE_HEADER_PRINTED

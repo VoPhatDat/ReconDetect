@@ -43,11 +43,7 @@ def list_interfaces() -> list[dict]:
 
 
 def print_interfaces():
-    print("\nDanh sách interface:\n")
+    print("\n Interface Lists:\n")
     for iface in list_interfaces():
         print(f"  [{iface['index']}] {iface['name']}")
     print()
-
-
-if __name__ == "__main__":
-    pass

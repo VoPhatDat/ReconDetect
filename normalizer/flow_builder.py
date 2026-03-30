@@ -2,16 +2,7 @@
 
 
 class flow_builder:
-    """
-    Gom lưu lượng theo `src_ip`.
 
-    Bản cũ gom và tích lũy theo suốt phiên live -> feature như `duration`,
-    `pkt_per_sec`, `port_entropy` phản ánh "từ lúc bắt đầu", không đúng cho
-    "cửa sổ thời gian gần nhất".
-
-    Bản này hỗ trợ rolling window: bật `window_seconds` thì chỉ giữ packet event
-    trong khoảng `now - window_seconds ... now`.
-    """
 
     def __init__(self, window_seconds: float | None = None):
         # window_seconds=None => tích lũy toàn bộ session (giống hành vi cũ, dùng cho pcap mode)
