@@ -1,6 +1,5 @@
 ### Note
-Documentation is available in the repository.
-
+Documentation is being written.
 To run the project, clone this repository and check the help menu:
 python main.py -h
 
