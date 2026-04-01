@@ -2,8 +2,6 @@
 
 
 class flow_builder:
-
-
     def __init__(self, window_seconds: float | None = None):
         # window_seconds=None => tích lũy toàn bộ session (giống hành vi cũ, dùng cho pcap mode)
         self.window_seconds = window_seconds

@@ -120,16 +120,20 @@ def report(
     output_txt_path: str | None = None,
     quiet_if_empty: bool = True,
     one_line_console: bool = False,
+    reset_table_header: bool = False,
 ) -> None:
     """
     In alert theo thời gian thực (console) và tùy chọn ghi ra file txt.
     """
+    global _TABLE_HEADER_PRINTED
+    if reset_table_header:
+        _TABLE_HEADER_PRINTED = False
+    
     if not alerts:
         if not quiet_if_empty:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] ✓ No alerts detected.")
         return
 
-    global _TABLE_HEADER_PRINTED
     for alert in alerts:
         console_text = format_alert_oneline(alert) if one_line_console else format_alert(alert)
         if one_line_console and not _TABLE_HEADER_PRINTED:

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import glob
 import time
 
 from collector import parser
@@ -19,6 +20,24 @@ RULES_PATH = "rules"
 
 
 def run_pcap(pcap_path: str, output_txt_path: str | None = None) -> None:
+    # Nếu chứa wildcard, expand thành list files
+    if '*' in pcap_path:
+        pcap_files = glob.glob(pcap_path)
+        if not pcap_files:
+            print(f"[!] No files found matching: {pcap_path}")
+            return
+        print(f"[*] Found {len(pcap_files)} PCAP files matching: {pcap_path}")
+        for file in pcap_files:
+            process_single_pcap(file, output_txt_path)
+        return
+
+    # Single file
+    process_single_pcap(pcap_path, output_txt_path)
+
+
+def process_single_pcap(pcap_path: str, output_txt_path: str | None = None) -> None:
+    print("\n")
+    print(f"--- Processing: {pcap_path} ---")
     print(f"[*] Reading file: {pcap_path}")
 
     builder = flow_builder(window_seconds=None)  # pcap mode: tích lũy toàn session
@@ -37,12 +56,19 @@ def run_pcap(pcap_path: str, output_txt_path: str | None = None) -> None:
         alerts = match(features, rules)
         all_alerts.extend(alerts)
 
+    # Print file header for alerts
+    if all_alerts:
+        print(f"=== Alerts from {pcap_path} ===")
+    
     report(
         all_alerts,
         output_txt_path=output_txt_path,
-        quiet_if_empty=False,
-        one_line_console=False,
+        quiet_if_empty=False,  # In "No alerts detected" nếu empty
+        one_line_console=True,  # Mỗi alert 1 dòng như live mode
+        reset_table_header=True,  # Reset header cho mỗi file
     )
+    
+    print()  # Empty line after file processing
 
 
 def run_live(
@@ -148,6 +174,9 @@ EXAMPLES:
   # Analyze PCAP file
   python main.py --mode pcap --pcap-path "pcap/scan.pcapng"
  
+  # Analyze all PCAP files in a directory
+  python main.py --mode pcap --pcap-path "pcap/*.pcapng"
+ 
   # Monitor live traffic on eth0
   sudo python main.py --mode live --interface eth0
  
@@ -164,7 +193,7 @@ DOCUMENTATION:
     )
     parser.add_argument("--list-interfaces",action="store_true",help="List available network interfaces and exit")
     parser.add_argument("--mode",choices=["live", "pcap"],default="live",help="Detection mode: 'live' (monitor interface) or 'pcap' (analyze file) (default: live)")
-    parser.add_argument("--pcap-path",default="pcap/Nmap-and-Wireshark-Lab-main/SX Scan.pcapng",help="Path to PCAP file (required for --mode pcap)")
+    parser.add_argument("--pcap-path",default="pcap/Nmap-and-Wireshark-Lab-main/SX Scan.pcapng",help="Path to PCAP file or pattern (e.g., 'pcap/*.pcapng') to analyze all matching files (required for --mode pcap)")
     parser.add_argument("--interface",default=None,help="Network interface to capture from (default: read from config.json)")
     parser.add_argument("--window-seconds",type=float,default=10.0,help="Rolling window size for flow analysis in seconds (default: 10.0)")
     parser.add_argument("--report-interval",type=float,default=1.0,help="Interval between alert reports in seconds (default: 1.0)")

@@ -108,6 +108,16 @@ rules:
       dst_ip_count:     { gt: 1 }
       syn_count:        { lt: 5 }
 
+  - id: R265
+    name: ACK Scan (Nmap -sA / -sM)
+    confidence: CONFIRMED
+    conditions:
+      ack_count: { gt: 80 }
+      syn_count: { eq: 0 }
+      port_count: { gt: 10 }
+      pkt_per_sec: { gt: 20 }
+      dst_ip_count: { gt: 0 }
+
   - id: R270
     name: NULL Scan
     confidence: CONFIRMED
@@ -142,3 +152,12 @@ rules:
     conditions:
       dst_ip_count: { gt: 15 }
       port_count:   { gt: 30 }
+
+  - id: R255
+    name: High Confidence SYN Scan (SA Inferred)
+    confidence: CONFIRMED
+    conditions:
+      syn_count:        { gt: 80 }
+      ack_ratio:        { lt: 0.2 }
+      tcp_port_entropy: { gt: 4 }
+      pkt_per_sec:      { gt: 20 }
