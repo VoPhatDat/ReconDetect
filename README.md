@@ -1,10 +1,11 @@
 ### Note
-Documentation is being written.
+Documentation is currently being written.
 
 To run the project, clone this repository and check the help menu:
 python main.py -h
 
 PCAP traffic files are stored in the `pcap/` directory.
-In progress 
-  collector (✔)
-  normalizer/flow_builder (✔)
+
+### Progress
+- collector (✔)
+- normalizer/flow_builder (✔)
