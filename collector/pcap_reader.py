@@ -31,15 +31,3 @@ def read(filepath: str):
 			if pkt is None:
 				continue
 			yield pkt
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Lỗi: chưa nhập đường dẫn file PCAP.")
-        print("Cách dùng: python -m collector.pcap_reader <đường dẫn file>")
-        print("Ví dụ:     python -m collector.pcap_reader pcap/TCP_Syn.pcapng")
-        sys.exit(1)
-
-    filepath = sys.argv[1]
-    print(f"Đọc file: {filepath}\n")
-    for i, pkt in enumerate(read(filepath), start=1):
-        print(f"[{i}] {pkt}")

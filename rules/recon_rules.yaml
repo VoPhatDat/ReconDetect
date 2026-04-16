@@ -1,43 +1,36 @@
 rules:
-
-  # ========================
-  # 🔥 MASSIVE RECON & HOST DISCOVERY
-  # ========================
-  - id: R200
+  - id: R001  # Phát hiện scan nhiều IP (host discovery lớn)
     name: Massive Host Discovery
     confidence: CONFIRMED
     conditions:
       dst_ip_count: { gt: 100 }
 
-  - id: R201
+  - id: R002  # Scan nhiều IP trong thời gian ngắn (fast sweep)
     name: Wide Network Scan (Fast)
     confidence: CONFIRMED
     conditions:
       dst_ip_count: { gt: 50 }
       duration:     { lt: 30 }
 
-  # ========================
-  # ⚡ SPEED DETECTION (đã siết chặt để giảm false positive)
-  # ========================
-  - id: R210
+  - id: R003  # Scan siêu nhanh kiểu masscan/zmap
     name: Ultra Fast Scan (Masscan/ZMap)
     confidence: CONFIRMED
     conditions:
       pkt_per_sec:  { gt: 100 }
-      dst_ip_count: { gt: 10 }          # phải quét nhiều IP
-      syn_count:    { gt: 80 }          # tránh match nhầm traffic burst không phải scan
+      dst_ip_count: { gt: 10 }
+      syn_count:    { gt: 80 }
 
-  - id: R211
+  - id: R004  # Scan nhanh kiểu nmap -T4/-T5
     name: High Speed Scan (Nmap -T4/-T5)
     confidence: CONFIRMED
     conditions:
       pkt_per_sec:  { gt: 50 }
       duration:     { lt: 10 }
-      port_count:   { gt: 20 }          # phải quét nhiều port
+      port_count:   { gt: 20 }
       syn_count:    { gt: 60 }
       ack_ratio:    { lt: 0.6 }
 
-  - id: R212
+  - id: R005  # Scan tốc độ trung bình, có entropy cao
     name: Medium Speed Scan
     confidence: SUSPECTED
     conditions:
@@ -47,7 +40,7 @@ rules:
       syn_count:        { gt: 60 }
       dst_ip_count:     { gt: 2 }
 
-  - id: R213
+  - id: R006  # Burst scan (bắn nhanh trong thời gian cực ngắn)
     name: Burst Scan
     confidence: CONFIRMED
     conditions:
@@ -55,31 +48,27 @@ rules:
       duration:     { lt: 5 }
       dst_ip_count: { gt: 5 }
 
-  # ========================
-  # Các rule còn lại giữ nguyên (ICMP, ARP, Stealth, Entropy, Combo...)
-  # (mình chỉ rút gọn phần tốc độ, phần còn lại bạn giữ nguyên như bộ trước)
-  # ========================
-  - id: R220
+  - id: R007  # ICMP sweep mạnh (ping nhiều host)
     name: ICMP Sweep Aggressive
     confidence: CONFIRMED
     conditions:
       icmp_echo:    { gt: 30 }
       dst_ip_count: { gt: 20 }
 
-  - id: R230
+  - id: R008  # ARP sweep lớn trong LAN
     name: ARP Massive Sweep
     confidence: CONFIRMED
     conditions:
       arp_request:  { gt: 50 }
       dst_ip_count: { gt: 50 }
 
-  - id: R240
+  - id: R009  # Scan toàn bộ port (full scan)
     name: Full Port Scan
     confidence: CONFIRMED
     conditions:
       port_count: { gt: 1000 }
 
-  - id: R250
+  - id: R010  # SYN scan (nmap -sS đặc trưng)
     name: SYN Scan (Nmap -sS)
     confidence: CONFIRMED
     conditions:
@@ -87,19 +76,16 @@ rules:
       ack_ratio:    { lt: 0.3 }
       tcp_port_entropy: { gt: 3 }
 
-  # ========================
-  # UDP scan detection
-  # ========================
-  - id: R260
+  - id: R011  # UDP scan diện rộng
     name: UDP Port Scan (Broad)
     confidence: CONFIRMED
     conditions:
       udp_port_count:   { gt: 30 }
       udp_packet_count: { gt: 60 }
       udp_port_entropy: { gt: 4 }
-      syn_count:        { lt: 5 }   # tránh nhầm với TCP scan
+      syn_count:        { lt: 5 }
 
-  - id: R261
+  - id: R012  # UDP scan mức trung bình
     name: UDP Scan (Moderate)
     confidence: SUSPECTED
     conditions:
@@ -108,7 +94,7 @@ rules:
       dst_ip_count:     { gt: 1 }
       syn_count:        { lt: 5 }
 
-  - id: R265
+  - id: R013  # ACK scan (nmap -sA / -sM)
     name: ACK Scan (Nmap -sA / -sM)
     confidence: CONFIRMED
     conditions:
@@ -118,26 +104,26 @@ rules:
       pkt_per_sec: { gt: 20 }
       dst_ip_count: { gt: 0 }
 
-  - id: R270
+  - id: R014  # NULL scan (no flags)
     name: NULL Scan
     confidence: CONFIRMED
     conditions:
       null_count: { gt: 10 }
 
-  - id: R271
+  - id: R015  # XMAS scan (FIN+PSH+URG)
     name: XMAS Scan
     confidence: CONFIRMED
     conditions:
       xmas_count: { gt: 10 }
 
-  - id: R272
+  - id: R016  # FIN scan (stealth)
     name: FIN Scan
     confidence: CONFIRMED
     conditions:
       fin_count: { gt: 10 }
       syn_count: { lt: 5 }
 
-  - id: R280
+  - id: R017  # Scan entropy cao (tool random port)
     name: High Entropy Port Scan (tool tự động)
     confidence: CONFIRMED
     conditions:
@@ -145,15 +131,14 @@ rules:
       tcp_port_count:   { gt: 30 }
       syn_count:        { gt: 60 }
 
-  # Combo
-  - id: R290
+  - id: R018  # Chuỗi recon: sweep + scan port
     name: Recon Chain (Sweep + Port Scan)
     confidence: CONFIRMED
     conditions:
       dst_ip_count: { gt: 15 }
       port_count:   { gt: 30 }
 
-  - id: R255
+  - id: R019  # SYN scan độ tin cậy cao (inferred từ SA behavior)
     name: High Confidence SYN Scan (SA Inferred)
     confidence: CONFIRMED
     conditions:

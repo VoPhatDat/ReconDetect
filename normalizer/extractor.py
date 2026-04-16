@@ -28,7 +28,6 @@ SUPPORTED_FEATURES = {
     "udp_packet_count",
     "udp_port_entropy",
     "packet_count",
-    # Metadata dùng cho hiển thị
     "timestamp",
 }
 

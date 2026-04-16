@@ -11,7 +11,7 @@ from collector.pcap_reader import read
 from engine.rule_loader import load_rules
 from engine.rule_matcher import match
 from normalizer.extractor import extract_all
-from normalizer.flow_builder import flow_builder
+from normalizer.flow_aggregator import FlowAggregateBuilder
 from output.reporter import report
 
 
@@ -40,7 +40,7 @@ def process_single_pcap(pcap_path: str, output_txt_path: str | None = None) -> N
     print(f"--- Processing: {pcap_path} ---")
     print(f"[*] Reading file: {pcap_path}")
 
-    builder = flow_builder(window_seconds=None)  # pcap mode: tích lũy toàn session
+    builder = FlowAggregateBuilder(window_seconds=None)  # pcap mode: tích lũy toàn session
     for pkt in read(pcap_path):
         builder.add_packet(pkt)
 
@@ -85,7 +85,7 @@ def run_live(
     rules = load_rules(RULES_PATH)
     print(f"[*] Loaded {len(rules)} rules\n")
 
-    builder = flow_builder(window_seconds=window_seconds)
+    builder = FlowAggregateBuilder(window_seconds=window_seconds)
     # key=(src_ip, rule_id) -> last_alert_ts_epoch
     last_alert_by_key: dict[tuple[str, str], float] = {}
 
